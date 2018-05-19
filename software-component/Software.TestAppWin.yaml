@@ -1,0 +1,95 @@
+'@type': "SoftwareComponentType"
+createdDate: "2017-05-07T13:23:48.592Z"
+lastUpdated: "2018-05-19T14:16:27.799Z"
+id: "Software.TestAppWin"
+name: "Any custom property binding (Windows)"
+description: "An example on Windows how one can use a Select-String query to find\
+  \ and bind any custom property that is included as part of the payload with a provisioned\
+  \ machine in vRA. This software component works by searching the C:\\opt\\vmware-appdirector\\\
+  agent\\logs\\darwin-agent*.log file for the desired custom property and, through\
+  \ a computed property, sets its value to the value found for that custom property.\
+  \ In this example, the custom property name has also been parameterized so as to\
+  \ make it configurable outside of the script element itself."
+publishStatus: "PUBLISHED"
+publishStatusName: "Published"
+schema:
+  fields:
+  - id: "property1"
+    label: "property1"
+    description: ""
+    dataType:
+      type: "primitive"
+      typeId: "STRING"
+    state:
+      dependencies: []
+      facets:
+      - type: "derivedValue"
+        value:
+          type: "constant"
+      - type: "editable"
+        value:
+          type: "constant"
+          value:
+            type: "boolean"
+            value: false
+    isMultiValued: false
+  - id: "customprop"
+    label: "customprop"
+    description: ""
+    dataType:
+      type: "primitive"
+      typeId: "STRING"
+    state:
+      dependencies: []
+      facets:
+      - type: "defaultValue"
+        value:
+          type: "constant"
+          value:
+            type: "string"
+            value: "sovlabs.naming.location"
+    isMultiValued: false
+  - id: "host"
+    label: "Container"
+    description: ""
+    dataType:
+      type: "ref"
+      componentTypeId: "com.vmware.csp.iaas.blueprint.service"
+      classId: "Infrastructure.Machine.Schema"
+      label: "Machine"
+    state:
+      dependencies: []
+      facets:
+      - type: "internal"
+        value:
+          type: "constantClause"
+          value:
+            type: "boolean"
+            value: true
+      - type: "visible"
+        value:
+          type: "constantClause"
+          value:
+            type: "boolean"
+            value: false
+      - type: "mandatory"
+        value:
+          type: "constant"
+          value:
+            type: "boolean"
+            value: true
+    isMultiValued: false
+containerFieldId: "host"
+lifecycleTasks:
+- createdDate: "2017-05-07T13:23:48.593Z"
+  lastUpdated: "2018-05-19T14:16:27.799Z"
+  script:
+    scriptContent: "$string = Select-String -Path C:\\opt\\vmware-appdirector\\agent\\\
+      logs\\darwin-agent*.log -Pattern \"$customprop\" | Select-Object -Last 1\r\n\
+      $string -match \"(?<=$customprop' value ')[^']*\" | Out-Null\r\n$property1 =\
+      \ $Matches[0]\r\nWrite-Output \"My custom property value is $property1\""
+    isRebootAfter: false
+    scriptTypeId: "powershell"
+  taskDescriptorRef:
+    id: "INSTALL"
+    label: "Install"
